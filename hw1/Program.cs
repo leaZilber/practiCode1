@@ -16,18 +16,22 @@ namespace hw1
                 { "Python", ".py" },
                 { "TypeScript", ".ts" }
             };
-            var rootCommand = new RootCommand();
+            var rootCommand = new RootCommand();//שורש
+            //יצירת קומנד בן
             var bundle = new Command("bundle");
             var createRsp = new Command("creat-rsp");
+            //הוספת קומנד הבן
             rootCommand.AddCommand(bundle);
             rootCommand.AddCommand(createRsp);
-            var optionLanguage = new Option<string[]>(new[] { "--language", "--l" });
+            //הקצאת האופציות
+            var optionLanguage = new Option<string[]>(new[] { "--language", "-l" });
             optionLanguage.AllowMultipleArgumentsPerToken = true;
-            var optionOutput = new Option<FileInfo>(new[] { "--output", "--o" });
-            var optionNote = new Option<bool>(new[] { "--note", "--n" });
-            var optionSort = new Option<string>(new[] { "--sort", "--s" });
-            var optionRemoveEmptyLines = new Option<bool>(new[] { "--Remove-empty-lines", "--rel" });
-            var optionAuthor = new Option<string>(new[] { "--author", "--a" });
+            var optionOutput = new Option<FileInfo>(new[] { "--output", "-o" });
+            var optionNote = new Option<bool>(new[] { "--note", "-n" });
+            var optionSort = new Option<string>(new[] { "--sort", "-s" });
+            var optionRemoveEmptyLines = new Option<bool>(new[] { "--Remove-empty-lines", "-rel" });
+            var optionAuthor = new Option<string>(new[] { "--author", "-a" });
+            //הוספת האופציות לקומנדי הבן
             bundle.AddOption(optionOutput);
             bundle.AddOption(optionLanguage);
             bundle.AddOption(optionNote);
@@ -35,6 +39,7 @@ namespace hw1
             bundle.AddOption(optionAuthor);
             bundle.AddOption(optionRemoveEmptyLines);
             createRsp.AddGlobalOption(optionOutput);
+
             bundle.SetHandler((string[] languages, FileInfo output, bool note, string sort, bool removeEmptyLines, string author) =>
             {
                 if (languages == null || languages.Length == 0 || output == null || string.IsNullOrWhiteSpace(sort) || string.IsNullOrWhiteSpace(author))
@@ -47,21 +52,15 @@ namespace hw1
                 {
                     List<string> Locations = new List<string>();
                     if (languages[0].Equals("all", StringComparison.OrdinalIgnoreCase))
-                    {
                         Locations.AddRange(Directory.GetFiles(".\\", "*.*", SearchOption.AllDirectories));
-                    }
                     else
                     {
                         foreach (var lang in languages)
                         {
                             if (dict.TryGetValue(lang, out var extension))
-                            {
                                 Locations.AddRange(Directory.GetFiles(".\\", $"*{extension}", SearchOption.AllDirectories));
-                            }
                             else
-                            {
                                 Console.WriteLine($"Warning: '{lang}' is not a recognized language. Skipping.");
-                            }
                         }
                     }
 
@@ -72,14 +71,9 @@ namespace hw1
                     }
 
                     if (sort == "abc")
-                    {
                         Locations = Locations.OrderBy(l => l).ToList();
-                    }
                     else if (sort == "lan")
-                    {
                         Locations = Locations.OrderBy(l => Path.GetExtension(l)).ToList();
-                    }
-
                     using (var fileText = File.CreateText(output.FullName))
                     {
                         fileText.WriteLine("//The author is: " + author);
@@ -94,9 +88,7 @@ namespace hw1
 
                             var context = File.ReadAllText(location);
                             if (removeEmptyLines)
-                            {
                                 context = string.Join(Environment.NewLine, context.Split('\n').Where(l => !string.IsNullOrEmpty(l)));
-                            }
                             fileText.WriteLine(context);
                             fileText.WriteLine(); // Start a new line in the file
                         }
